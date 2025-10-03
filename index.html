@@ -18,7 +18,6 @@ textarea{min-height:120px}
 </style>
 </head>
 <body>
-<!-- ======== START OF TEST ======== -->
 <h1>Math Quiz</h1>
 <p class="note">Start on the first screen, then take the quiz. When you press Submit, a confirmation appears on this page (no server).</p>
 
@@ -30,7 +29,7 @@ textarea{min-height:120px}
 <label for="studentName">Your Name</label>
 <input id="studentName" type="text" placeholder="e.g., Alex Rivera" required />
 <div class="submit-row">
-<button type="button" id="startBtn">Start Quiz</button>
+<button type="button" id="startBtn" onclick="startQuiz()">Start Quiz</button>
 </div>
 <div id="startError" class="note" role="alert" aria-live="assertive"></div>
 </section>
@@ -48,4 +47,58 @@ textarea{min-height:120px}
 
 <p><strong>2)</strong> Solve: 18 &divide; 3 =</p>
 <label><input type="radio" name="q2" value="5" required /> 5</label>
-</html>
+<label><input type="radio" name="q2" value="6" /> 6</label>
+<label><input type="radio" name="q2" value="9" /> 9</label>
+
+
+<p><strong>3)</strong> Which inequality is true?</p>
+<label><input type="radio" name="q3" value="3_lt_2" required /> 3 &lt; 2</label>
+<label><input type="radio" name="q3" value="5_le_5" /> 5 &le; 5</label>
+<label><input type="radio" name="q3" value="9_gt_12" /> 9 &gt; 12</label>
+</fieldset>
+
+
+<fieldset>
+<legend>Word Problem</legend>
+<p><strong>4)</strong> A baker made 48 cupcakes. She packs them equally into boxes of 6. How many boxes are filled? If 2 are taste-tested first, how many are left unpacked? Explain your reasoning clearly.</p>
+<textarea id="wordAnswer" placeholder="Type your explanation here..." required></textarea>
+</fieldset>
+
+
+<fieldset>
+<legend>Math Symbols (examples)</legend>
+<p>&plus; &minus; &times; &divide; &lt; &gt; &le; &ge; &pi;</p>
+</fieldset>
+
+
+<div class="submit-row">
+<button type="button" id="submitBtn">Submit</button>
+</div>
+</form>
+
+
+<!-- Confirmation -->
+<section id="confirmation" class="card hidden">
+<h2>Submission Received</h2>
+<p id="confirmMsg"></p>
+</section>
+
+
+<script>
+function startQuiz(){
+const nameInput = document.getElementById('studentName');
+const startError = document.getElementById('startError');
+const startScreen = document.getElementById('startScreen');
+const quizForm = document.getElementById('quizForm');
+if(!nameInput.value.trim()){
+startError.textContent = 'Please enter your name to begin.';
+nameInput.focus();
+return;
+}
+startError.textContent = '';
+startScreen.classList.add('hidden');
+quizForm.classList.remove('hidden');
+}
+
+
+document.getElementById('submitBtn').addEventListener('click', ()=>{
