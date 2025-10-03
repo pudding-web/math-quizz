@@ -3,42 +3,37 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Math Quiz — Start then Quiz (JS + No-JS fallback)</title>
+<title>Math Quiz — Assignment Version</title>
 <style>
-  body{font-family: Arial, Helvetica, sans-serif; margin:20px; line-height:1.35}
-  h1{margin-bottom:.25rem}
-  .note{color:#444;margin-top:0}
-  fieldset{margin:16px 0; padding:12px}
-  label{display:block; margin:.35rem 0}
-  .submit-row{margin-top:16px}
-  input[type="text"], textarea{width:100%; max-width:700px; padding:.5rem}
-  textarea{min-height:120px}
-  .hidden{display:none}
-  .card{border:1px solid #ccc; padding:16px; max-width:760px}
-
-  /* --- No-JS fallback using :target --- */
-  /* Quiz is hidden by default */
-  #quiz{display:none}
-  /* If URL has #quiz, show quiz and hide start screen */
-  #quiz:target{display:block}
-  #quiz:target ~ #startScreen{display:none}
-  /* If URL has #start, ensure start is shown and quiz hidden */
-  #start:target ~ #quiz{display:none}
-  #start:target{display:block}
-  /* Button-look for anchor */
-  .btn{display:inline-block; padding:.6rem .9rem; border:1px solid #333; border-radius:8px; text-decoration:none; color:#111; background:#f5f5f5}
-  .btn:focus{outline:2px solid #000}
+  body { font-family: Arial, Helvetica, sans-serif; margin: 20px; line-height: 1.4 }
+  .card { border: 1px solid #ccc; padding: 16px; max-width: 760px }
+  fieldset { margin: 16px 0; padding: 12px }
+  label { display: block; margin: .35rem 0 }
+  input[type="text"], textarea { width: 100%; max-width: 700px; padding: .5rem }
+  textarea { min-height: 120px }
+  .submit-row { margin-top: 16px }
+  .note { color:#444; margin:.25rem 0 0 }
 </style>
 </head>
 <body>
-<h1>Math Quiz</h1>
-<p class="note">Start first, then take the quiz. Works with JavaScript and also without it.</p>
 
-<!-- Quiz FIRST so :target can hide start via sibling selector -->
-<form id="quiz" class="card" novalidate>
-  <h2>Quiz</h2>
+<h1>Math Quiz</h1>
+<p class="note">Fill out your name, answer the questions, and submit.</p>
+
+<form class="card" id="mathQuiz">
+  <!-- ===== START OF TEST ===== -->
+
+  <!-- Name field -->
+  <fieldset>
+    <legend>Student Info</legend>
+    <label for="studentName">Your Name</label>
+    <input id="studentName" name="studentName" type="text" placeholder="e.g., Alex Rivera" required />
+  </fieldset>
+
+  <!-- Multiple Choice -->
   <fieldset>
     <legend>Multiple Choice (choose one per question)</legend>
+
     <p><strong>1)</strong> What is 7 &times; 6?</p>
     <label><input type="radio" name="q1" value="36" required /> 36</label>
     <label><input type="radio" name="q1" value="42" /> 42</label>
@@ -55,112 +50,44 @@
     <label><input type="radio" name="q3" value="9_gt_12" /> 9 &gt; 12</label>
   </fieldset>
 
+  <!-- Word Problem -->
   <fieldset>
     <legend>Word Problem</legend>
     <p><strong>4)</strong> A baker made 48 cupcakes. She packs them equally into boxes of 6. How many boxes are filled? If 2 are taste-tested first, how many are left unpacked? Explain your reasoning clearly.</p>
-    <textarea id="wordAnswer" placeholder="Type your explanation here..." required></textarea>
+    <label for="wordAnswer" class="visually-hidden">Your Explanation</label>
+    <textarea id="wordAnswer" name="wordAnswer" placeholder="Type your explanation here..." required></textarea>
   </fieldset>
 
+  <!-- Math Symbols -->
   <fieldset>
     <legend>Math Symbols (examples)</legend>
-    <p>&plus; &minus; &times; &divide; &lt; &gt; &le; &ge; &pi;</p>
+    <p>
+      &plus; (plus) &nbsp; &minus; (minus) &nbsp; &times; (times) &nbsp; &divide; (divide) &nbsp;
+      &lt; (less than) &nbsp; &gt; (greater than) &nbsp; &le; (less than or equal) &nbsp; &ge; (greater than or equal)
+    </p>
   </fieldset>
 
+  <!-- Submit Button -->
   <div class="submit-row">
-    <button type="button" id="submitBtn">Submit</button>
-    <a class="btn" href="#start" id="backToStart">Back to Start</a>
+    <button type="submit" id="submitBtn">Submit</button>
+    <div class="note" id="msg" role="status" aria-live="polite"></div>
   </div>
-  <div id="quizError" class="note" role="alert" aria-live="assertive"></div>
+
+  <!-- ===== END OF TEST ===== -->
 </form>
 
-<!-- Start Screen AFTER quiz so CSS can hide it when #quiz is targeted -->
-<section id="startScreen" class="card" aria-labelledby="startTitle">
-  <h2 id="startTitle">Start Quiz</h2>
-  <p>Enter your name and click <strong>Start Quiz</strong>.</p>
-  <label for="studentName">Your Name</label>
-  <input id="studentName" type="text" placeholder="e.g., Alex Rivera" required />
-  <div class="submit-row">
-    <!-- Anchor starts quiz even without JS -->
-    <a href="#quiz" id="startLink" class="btn">Start Quiz</a>
-    <!-- Button also calls JS when available -->
-    <button type="button" id="startBtn">Start (JS)</button>
-  </div>
-  <div id="startError" class="note" role="alert" aria-live="assertive"></div>
-</section>
-
 <script>
-  // Helper: simple required check for radios per group
-  function radioGroupChecked(name) {
-    return !!document.querySelector('input[name="' + name + '"]:checked');
-  }
+  // Simple client-side submission handler (prevents navigation errors on static hosts)
+  document.getElementById('mathQuiz').addEventListener('submit', function (e) {
+    e.preventDefault(); // avoid 405 errors on static hosting
+    const form = e.currentTarget;
+    if (!form.reportValidity()) return;
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const startBtn = document.getElementById('startBtn');
-    const startLink = document.getElementById('startLink');
-    const nameInput = document.getElementById('studentName');
-    const startError = document.getElementById('startError');
-
-    const quizForm = document.getElementById('quiz');
-    const submitBtn = document.getElementById('submitBtn');
-    const quizError = document.getElementById('quizError');
-
-    // Make the JS Start button work
-    startBtn.addEventListener('click', () => {
-      const name = nameInput.value.trim();
-      if (!name) {
-        startError.textContent = 'Please enter your name before starting.';
-        nameInput.focus();
-        return;
-      }
-      startError.textContent = '';
-      // Use the same mechanism as the no-JS link so CSS :target toggles views
-      location.hash = '#quiz';
-      // Optional: put the cursor in the first question
-      const firstRadio = document.querySelector('input[name="q1"]');
-      if (firstRadio) firstRadio.focus();
-    });
-
-    // Optional: if they use the no-JS link while JS is available, still validate the name
-    startLink.addEventListener('click', (e) => {
-      if (!nameInput.value.trim()) {
-        e.preventDefault();
-        startError.textContent = 'Please enter your name before starting.';
-        nameInput.focus();
-      } else {
-        startError.textContent = '';
-      }
-    });
-
-    // Basic front-end validation for quiz submission
-    submitBtn.addEventListener('click', () => {
-      quizError.textContent = '';
-      const wordAnswer = document.getElementById('wordAnswer');
-
-      const allGood =
-        radioGroupChecked('q1') &&
-        radioGroupChecked('q2') &&
-        radioGroupChecked('q3') &&
-        wordAnswer.value.trim().length > 0;
-
-      if (!allGood) {
-        quizError.textContent = 'Please answer all questions before submitting.';
-        // Focus the first missing thing
-        if (!radioGroupChecked('q1')) {
-          document.querySelector('input[name="q1"]').focus();
-        } else if (!radioGroupChecked('q2')) {
-          document.querySelector('input[name="q2"]').focus();
-        } else if (!radioGroupChecked('q3')) {
-          document.querySelector('input[name="q3"]').focus();
-        } else {
-          wordAnswer.focus();
-        }
-        return;
-      }
-
-      // Replace with whatever you want to do on successful submit
-      alert('Thanks! Your quiz has been submitted.');
-    });
+    const name = document.getElementById('studentName').value.trim();
+    document.getElementById('msg').textContent = 'Thanks, ' + (name || 'student') + '! Your responses were recorded locally.';
+    // If you later need to actually send results somewhere, replace the above with a fetch() call.
   });
 </script>
+
 </body>
 </html>
