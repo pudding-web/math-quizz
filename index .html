@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Simple Math Quiz</title>
+<title>Simple Math Quiz — With Start Screen</title>
 <style>
-body{font-family: Arial, Helvetica, sans-serif; margin:20px; line-height:1.35;}
+body{font-family: Arial, Helvetica, sans-serif; margin:20px; line-height:1.35}
 h1{margin-bottom:.25rem}
 .note{color:#444;margin-top:0}
 fieldset{margin:16px 0; padding:12px}
@@ -13,21 +13,33 @@ label{display:block; margin:.35rem 0}
 .submit-row{margin-top:16px}
 input[type="text"], textarea{width:100%; max-width:700px; padding:.5rem}
 textarea{min-height:120px}
+.hidden{display:none}
+.start-card{border:1px solid #ccc; padding:16px; max-width:720px}
+.row{margin:.5rem 0}
+button{padding:.5rem .9rem}
+.sr{position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden}
 </style>
 </head>
 <body>
 <!-- ======== START OF TEST ======== -->
 <h1>Math Quiz</h1>
-<p class="note">Enter your name, answer the questions, then press <strong>Submit</strong>.</p>
+<p class="note">Click <strong>Start Quiz</strong> to begin. Your name is required.</p>
 
 
-<form action="#" method="post">
-<!-- Name field -->
-<fieldset>
-<legend>Student Information</legend>
+<!-- Start screen -->
+<section id="startScreen" class="start-card" aria-labelledby="startTitle">
+<h2 id="startTitle">Start Quiz</h2>
+<div class="row">
 <label for="studentName">Your Name</label>
 <input id="studentName" name="studentName" type="text" placeholder="e.g., Alex Rivera" required />
-</fieldset>
+</div>
+<button id="startBtn" type="button">Start Quiz</button>
+<div id="startError" class="note" role="alert" aria-live="assertive"></div>
+</section>
+
+
+<!-- Quiz form (hidden until Start) -->
+<form id="quizForm" action="#" method="post" class="hidden">
 
 
 <!-- Multiple Choice Questions -->
@@ -76,6 +88,37 @@ textarea{min-height:120px}
 <button type="submit">Submit</button>
 </div>
 </form>
+
+
+<!-- live region to announce start -->
+<div id="live" class="sr" aria-live="polite"></div>
+
+
+<script>
+const startBtn = document.getElementById('startBtn');
+const nameInput = document.getElementById('studentName');
+const startScreen = document.getElementById('startScreen');
+const quizForm = document.getElementById('quizForm');
+const startError = document.getElementById('startError');
+const live = document.getElementById('live');
+
+
+startBtn.addEventListener('click', () => {
+const name = nameInput.value.trim();
+if(!name){
+startError.textContent = 'Please enter your name to begin.';
+nameInput.focus();
+return;
+}
+startError.textContent = '';
+startScreen.classList.add('hidden');
+quizForm.classList.remove('hidden');
+// move focus to first question for accessibility
+const firstRadio = quizForm.querySelector('input[type="radio"][name="q1"]');
+if (firstRadio) firstRadio.focus();
+live.textContent = 'Quiz started for ' + name + '.';
+});
+</script>
 <!-- ========= END OF TEST ========= -->
 </body>
 </html>
