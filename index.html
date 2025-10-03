@@ -39,7 +39,7 @@ button{padding:.5rem .9rem}
 
 
 <!-- Quiz form (hidden until Start) -->
-<form id="quizForm" action="#" method="post" class="hidden">
+<form id="quizForm" action="#" method="post" class="hidden" novalidate>
 
 
 <!-- Multiple Choice Questions -->
@@ -97,28 +97,3 @@ button{padding:.5rem .9rem}
 <script>
 const startBtn = document.getElementById('startBtn');
 const nameInput = document.getElementById('studentName');
-const startScreen = document.getElementById('startScreen');
-const quizForm = document.getElementById('quizForm');
-const startError = document.getElementById('startError');
-const live = document.getElementById('live');
-
-
-startBtn.addEventListener('click', () => {
-const name = nameInput.value.trim();
-if(!name){
-startError.textContent = 'Please enter your name to begin.';
-nameInput.focus();
-return;
-}
-startError.textContent = '';
-startScreen.classList.add('hidden');
-quizForm.classList.remove('hidden');
-// move focus to first question for accessibility
-const firstRadio = quizForm.querySelector('input[type="radio"][name="q1"]');
-if (firstRadio) firstRadio.focus();
-live.textContent = 'Quiz started for ' + name + '.';
-});
-</script>
-<!-- ========= END OF TEST ========= -->
-</body>
-</html>
