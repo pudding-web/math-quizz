@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Math Quiz — Clean Version</title>
+<title>Math Quiz — Start then Quiz</title>
 <style>
 body{font-family: Arial, Helvetica, sans-serif; margin:20px; line-height:1.35}
 h1{margin-bottom:.25rem}
@@ -13,24 +13,31 @@ label{display:block; margin:.35rem 0}
 .submit-row{margin-top:16px}
 input[type="text"], textarea{width:100%; max-width:700px; padding:.5rem}
 textarea{min-height:120px}
+.hidden{display:none}
+.card{border:1px solid #ccc; padding:16px; max-width:760px}
 </style>
 </head>
 <body>
 <!-- ======== START OF TEST ======== -->
 <h1>Math Quiz</h1>
-<p class="note">Enter your name, answer the questions, then press <strong>Submit</strong>. (Results are shown on this page; no server.)</p>
+<p class="note">Start on the first screen, then take the quiz. When you press Submit, a confirmation appears on this page (no server).</p>
 
 
-<form id="quizForm" onsubmit="return false;" novalidate>
-<!-- Name field -->
-<fieldset>
-<legend>Student Information</legend>
+<!-- Start Screen (separate) -->
+<section id="startScreen" class="card" aria-labelledby="startTitle">
+<h2 id="startTitle">Start Quiz</h2>
+<p>Enter your name and click <strong>Start Quiz</strong>.</p>
 <label for="studentName">Your Name</label>
-<input id="studentName" name="studentName" type="text" placeholder="e.g., Alex Rivera" />
-</fieldset>
+<input id="studentName" name="studentName" type="text" placeholder="e.g., Alex Rivera" required />
+<div class="submit-row">
+<button type="button" id="startBtn">Start Quiz</button>
+</div>
+<div id="startError" class="note" role="alert" aria-live="assertive"></div>
+</section>
 
 
-<!-- Multiple Choice Questions -->
+<!-- Quiz (hidden until Start) -->
+<form id="quizForm" class="hidden" novalidate>
 <fieldset>
 <legend>Multiple Choice (choose one per question)</legend>
 
@@ -54,15 +61,13 @@ textarea{min-height:120px}
 </fieldset>
 
 
-<!-- Word problem with multiline answer area -->
 <fieldset>
 <legend>Word Problem</legend>
 <p><strong>4)</strong> A baker made 48 cupcakes. She packs them equally into boxes of 6. How many boxes are filled? If 2 are taste-tested first, how many are left unpacked? Explain your reasoning clearly.</p>
-<textarea id="wordAnswer" name="wordAnswer" placeholder="Type your explanation here (show your work using symbols like 48 &divide; 6 = 8)" required></textarea>
+<textarea id="wordAnswer" name="wordAnswer" placeholder="Type your explanation here (you may write 48 &divide; 6 = 8, etc.)" required></textarea>
 </fieldset>
 
 
-<!-- Math symbols using ampersand notation -->
 <fieldset>
 <legend>Math Symbols (examples)</legend>
 <p>
@@ -71,34 +76,18 @@ textarea{min-height:120px}
 </fieldset>
 
 
-<!-- Submit button at the end of the test -->
 <div class="submit-row">
 <button type="button" id="submitBtn">Submit</button>
 </div>
 </form>
 
 
-<div id="live" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden" aria-live="polite"></div>
-
-
-<script>
-// Clean client-side grading. No navigation, no POST.
-(function(){
-const quizForm = document.getElementById('quizForm');
-const submitBtn = document.getElementById('submitBtn');
-const wordAnswer = document.getElementById('wordAnswer');
-const nameInput = document.getElementById('studentName');
-const live = document.getElementById('live');
-
-
-function grade(){
-const key = { q1: '42', q2: '6', q3: '5_le_5' };
-for (const q of Object.keys(key)) {
-if (!quizForm.querySelector(`input[name="${q}"]:checked`)) {
-alert('Please answer all multiple‑choice questions.');
-quizForm.querySelector(`input[name="${q}"]`).focus();
-return;
-}
-}
-if (!wordAnswer.value.trim()) {
-alert('Please complete the word‑problem explanation.');
+<!-- Confirmation area (shows after Submit) -->
+<section id="confirmation" class="card hidden" aria-live="polite" aria-labelledby="confirmTitle">
+<h2 id="confirmTitle">Submission Received</h2>
+<p id="confirmMsg"></p>
+<div class="submit-row">
+<button type="button" id="restartBtn">Restart</button>
+</div>
+</section>
+</html>
