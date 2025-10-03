@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Simple Math Quiz</title>
+<style>
+body{font-family: Arial, Helvetica, sans-serif; margin:20px; line-height:1.35;}
+h1{margin-bottom:.25rem}
+.note{color:#444;margin-top:0}
+fieldset{margin:16px 0; padding:12px}
+label{display:block; margin:.35rem 0}
+.submit-row{margin-top:16px}
+input[type="text"], textarea{width:100%; max-width:700px; padding:.5rem}
+textarea{min-height:120px}
+</style>
+</head>
+<body>
+<!-- ======== START OF TEST ======== -->
+<h1>Math Quiz</h1>
+<p class="note">Enter your name, answer the questions, then press <strong>Submit</strong>.</p>
+
+
+<form action="#" method="post">
+<!-- Name field -->
+<fieldset>
+<legend>Student Information</legend>
+<label for="studentName">Your Name</label>
+<input id="studentName" name="studentName" type="text" placeholder="e.g., Alex Rivera" required />
+</fieldset>
+
+
+<!-- Multiple Choice Questions -->
+<fieldset>
+<legend>Multiple Choice (choose one per question)</legend>
+
+
+<p><strong>1)</strong> What is 7 &times; 6?</p>
+<label><input type="radio" name="q1" value="36" required /> 36</label>
+<label><input type="radio" name="q1" value="42" /> 42</label>
+<label><input type="radio" name="q1" value="48" /> 48</label>
+
+
+<p><strong>2)</strong> Solve: 18 &divide; 3 =</p>
+<label><input type="radio" name="q2" value="5" required /> 5</label>
+<label><input type="radio" name="q2" value="6" /> 6</label>
+<label><input type="radio" name="q2" value="9" /> 9</label>
+
+
+<p><strong>3)</strong> Which inequality is true?</p>
+<label><input type="radio" name="q3" value="3_lt_2" required /> 3 &lt; 2</label>
+<label><input type="radio" name="q3" value="5_le_5" /> 5 &le; 5</label>
+<label><input type="radio" name="q3" value="9_gt_12" /> 9 &gt; 12</label>
+</fieldset>
+
+
+<!-- Word problem with multiline answer area -->
+<fieldset>
+<legend>Word Problem</legend>
+<p><strong>4)</strong> A baker made 48 cupcakes. She packs them equally into boxes of 6. How many boxes are filled? If she taste-tests 2 cupcakes first, how many are left unpacked? Explain your reasoning clearly.</p>
+<textarea id="wordAnswer" name="wordAnswer" placeholder="Type your explanation here (show your work using symbols like 48 &divide; 6 = 8)" required></textarea>
+</fieldset>
+
+
+<!-- Math symbols using ampersand notation -->
+<fieldset>
+<legend>Math Symbols (examples)</legend>
+<p>
+&plus; &nbsp; &minus; &nbsp; &times; &nbsp; &divide; &nbsp; &lt; &nbsp; &gt; &nbsp; &le; &nbsp; &ge; &nbsp; &pi;
+</p>
+</fieldset>
+
+
+<!-- Submit button at the end of the test -->
+<div class="submit-row">
+<button type="submit">Submit</button>
+</div>
+</form>
+<!-- ========= END OF TEST ========= -->
+</body>
+</html>
