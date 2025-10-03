@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Simple Math Quiz — With Start Screen</title>
+<title>Simple Math Quiz — Always Visible</title>
 <style>
 body{font-family: Arial, Helvetica, sans-serif; margin:20px; line-height:1.35}
 h1{margin-bottom:.25rem}
@@ -13,33 +13,21 @@ label{display:block; margin:.35rem 0}
 .submit-row{margin-top:16px}
 input[type="text"], textarea{width:100%; max-width:700px; padding:.5rem}
 textarea{min-height:120px}
-.hidden{display:none}
-.start-card{border:1px solid #ccc; padding:16px; max-width:720px}
-.row{margin:.5rem 0}
-button{padding:.5rem .9rem}
-.sr{position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden}
 </style>
 </head>
 <body>
 <!-- ======== START OF TEST ======== -->
 <h1>Math Quiz</h1>
-<p class="note">Click <strong>Start Quiz</strong> to begin. Your name is required.</p>
+<p class="note">Enter your name, answer the questions, then press <strong>Submit</strong>. (No server is used; results show on this page.)</p>
 
 
-<!-- Start screen -->
-<section id="startScreen" class="start-card" aria-labelledby="startTitle">
-<h2 id="startTitle">Start Quiz</h2>
-<div class="row">
+<form id="quizForm" novalidate>
+<!-- Name field (always visible now) -->
+<fieldset>
+<legend>Student Information</legend>
 <label for="studentName">Your Name</label>
-<input id="studentName" name="studentName" type="text" placeholder="e.g., Alex Rivera" required />
-</div>
-<button id="startBtn" type="button">Start Quiz</button>
-<div id="startError" class="note" role="alert" aria-live="assertive"></div>
-</section>
-
-
-<!-- Quiz form (hidden until Start) -->
-<form id="quizForm" class="hidden" novalidate>
+<input id="studentName" name="studentName" type="text" placeholder="e.g., Alex Rivera" />
+</fieldset>
 
 
 <!-- Multiple Choice Questions -->
@@ -69,7 +57,7 @@ button{padding:.5rem .9rem}
 <!-- Word problem with multiline answer area -->
 <fieldset>
 <legend>Word Problem</legend>
-<p><strong>4)</strong> A baker made 48 cupcakes. She packs them equally into boxes of 6. How many boxes are filled? If she taste-tests 2 cupcakes first, how many are left unpacked? Explain your reasoning clearly.</p>
+<p><strong>4)</strong> A baker made 48 cupcakes. She packs them equally into boxes of 6. How many boxes are filled? If 2 are taste-tested first, how many are left unpacked? Explain your reasoning clearly.</p>
 <textarea id="wordAnswer" name="wordAnswer" placeholder="Type your explanation here (show your work using symbols like 48 &divide; 6 = 8)" required></textarea>
 </fieldset>
 
@@ -90,14 +78,18 @@ button{padding:.5rem .9rem}
 </form>
 
 
-<!-- live region to announce start -->
-<div id="live" class="sr" aria-live="polite"></div>
+<div id="live" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden" aria-live="polite"></div>
 
 
 <script>
-const startBtn = document.getElementById('startBtn');
-const nameInput = document.getElementById('studentName');
-const startScreen = document.getElementById('startScreen');
+(function(){
 const quizForm = document.getElementById('quizForm');
-const startError = document.getElementById('startError');
+const submitBtn = document.getElementById('submitBtn');
+const wordAnswer = document.getElementById('wordAnswer');
+const nameInput = document.getElementById('studentName');
 const live = document.getElementById('live');
+
+
+function grade(){
+const key = { q1: '42', q2: '6', q3: '5_le_5' };
+for (const name of Object.keys(key)) {
