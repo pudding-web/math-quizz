@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Simple Math Quiz — Always Visible</title>
+<title>Math Quiz — Clean Version</title>
 <style>
 body{font-family: Arial, Helvetica, sans-serif; margin:20px; line-height:1.35}
 h1{margin-bottom:.25rem}
@@ -18,11 +18,11 @@ textarea{min-height:120px}
 <body>
 <!-- ======== START OF TEST ======== -->
 <h1>Math Quiz</h1>
-<p class="note">Enter your name, answer the questions, then press <strong>Submit</strong>. (No server is used; results show on this page.)</p>
+<p class="note">Enter your name, answer the questions, then press <strong>Submit</strong>. (Results are shown on this page; no server.)</p>
 
 
-<form id="quizForm" novalidate>
-<!-- Name field (always visible now) -->
+<form id="quizForm" onsubmit="return false;" novalidate>
+<!-- Name field -->
 <fieldset>
 <legend>Student Information</legend>
 <label for="studentName">Your Name</label>
@@ -82,6 +82,7 @@ textarea{min-height:120px}
 
 
 <script>
+// Clean client-side grading. No navigation, no POST.
 (function(){
 const quizForm = document.getElementById('quizForm');
 const submitBtn = document.getElementById('submitBtn');
@@ -92,4 +93,12 @@ const live = document.getElementById('live');
 
 function grade(){
 const key = { q1: '42', q2: '6', q3: '5_le_5' };
-for (const name of Object.keys(key)) {
+for (const q of Object.keys(key)) {
+if (!quizForm.querySelector(`input[name="${q}"]:checked`)) {
+alert('Please answer all multiple‑choice questions.');
+quizForm.querySelector(`input[name="${q}"]`).focus();
+return;
+}
+}
+if (!wordAnswer.value.trim()) {
+alert('Please complete the word‑problem explanation.');
