@@ -23,12 +23,12 @@ textarea{min-height:120px}
 <p class="note">Start on the first screen, then take the quiz. When you press Submit, a confirmation appears on this page (no server).</p>
 
 
-<!-- Start Screen (separate) -->
-<section id="startScreen" class="card" aria-labelledby="startTitle">
-<h2 id="startTitle">Start Quiz</h2>
+<!-- Start Screen -->
+<section id="startScreen" class="card">
+<h2>Start Quiz</h2>
 <p>Enter your name and click <strong>Start Quiz</strong>.</p>
 <label for="studentName">Your Name</label>
-<input id="studentName" name="studentName" type="text" placeholder="e.g., Alex Rivera" required />
+<input id="studentName" type="text" placeholder="e.g., Alex Rivera" required />
 <div class="submit-row">
 <button type="button" id="startBtn">Start Quiz</button>
 </div>
@@ -40,8 +40,6 @@ textarea{min-height:120px}
 <form id="quizForm" class="hidden" novalidate>
 <fieldset>
 <legend>Multiple Choice (choose one per question)</legend>
-
-
 <p><strong>1)</strong> What is 7 &times; 6?</p>
 <label><input type="radio" name="q1" value="36" required /> 36</label>
 <label><input type="radio" name="q1" value="42" /> 42</label>
@@ -50,44 +48,4 @@ textarea{min-height:120px}
 
 <p><strong>2)</strong> Solve: 18 &divide; 3 =</p>
 <label><input type="radio" name="q2" value="5" required /> 5</label>
-<label><input type="radio" name="q2" value="6" /> 6</label>
-<label><input type="radio" name="q2" value="9" /> 9</label>
-
-
-<p><strong>3)</strong> Which inequality is true?</p>
-<label><input type="radio" name="q3" value="3_lt_2" required /> 3 &lt; 2</label>
-<label><input type="radio" name="q3" value="5_le_5" /> 5 &le; 5</label>
-<label><input type="radio" name="q3" value="9_gt_12" /> 9 &gt; 12</label>
-</fieldset>
-
-
-<fieldset>
-<legend>Word Problem</legend>
-<p><strong>4)</strong> A baker made 48 cupcakes. She packs them equally into boxes of 6. How many boxes are filled? If 2 are taste-tested first, how many are left unpacked? Explain your reasoning clearly.</p>
-<textarea id="wordAnswer" name="wordAnswer" placeholder="Type your explanation here (you may write 48 &divide; 6 = 8, etc.)" required></textarea>
-</fieldset>
-
-
-<fieldset>
-<legend>Math Symbols (examples)</legend>
-<p>
-&plus; &nbsp; &minus; &nbsp; &times; &nbsp; &divide; &nbsp; &lt; &nbsp; &gt; &nbsp; &le; &nbsp; &ge; &nbsp; &pi;
-</p>
-</fieldset>
-
-
-<div class="submit-row">
-<button type="button" id="submitBtn">Submit</button>
-</div>
-</form>
-
-
-<!-- Confirmation area (shows after Submit) -->
-<section id="confirmation" class="card hidden" aria-live="polite" aria-labelledby="confirmTitle">
-<h2 id="confirmTitle">Submission Received</h2>
-<p id="confirmMsg"></p>
-<div class="submit-row">
-<button type="button" id="restartBtn">Restart</button>
-</div>
-</section>
 </html>
