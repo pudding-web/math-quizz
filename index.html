@@ -1,101 +1,166 @@
 <!DOCTYPE html>
-<a class="btn" href="#start" id="backToStart">Back to Start</a>
-</div>
-</form>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Math Quiz — Start then Quiz (JS + No-JS fallback)</title>
+<style>
+  body{font-family: Arial, Helvetica, sans-serif; margin:20px; line-height:1.35}
+  h1{margin-bottom:.25rem}
+  .note{color:#444;margin-top:0}
+  fieldset{margin:16px 0; padding:12px}
+  label{display:block; margin:.35rem 0}
+  .submit-row{margin-top:16px}
+  input[type="text"], textarea{width:100%; max-width:700px; padding:.5rem}
+  textarea{min-height:120px}
+  .hidden{display:none}
+  .card{border:1px solid #ccc; padding:16px; max-width:760px}
 
+  /* --- No-JS fallback using :target --- */
+  /* Quiz is hidden by default */
+  #quiz{display:none}
+  /* If URL has #quiz, show quiz and hide start screen */
+  #quiz:target{display:block}
+  #quiz:target ~ #startScreen{display:none}
+  /* If URL has #start, ensure start is shown and quiz hidden */
+  #start:target ~ #quiz{display:none}
+  #start:target{display:block}
+  /* Button-look for anchor */
+  .btn{display:inline-block; padding:.6rem .9rem; border:1px solid #333; border-radius:8px; text-decoration:none; color:#111; background:#f5f5f5}
+  .btn:focus{outline:2px solid #000}
+</style>
+</head>
+<body>
+<h1>Math Quiz</h1>
+<p class="note">Start first, then take the quiz. Works with JavaScript and also without it.</p>
+
+<!-- Quiz FIRST so :target can hide start via sibling selector -->
+<form id="quiz" class="card" novalidate>
+  <h2>Quiz</h2>
+  <fieldset>
+    <legend>Multiple Choice (choose one per question)</legend>
+    <p><strong>1)</strong> What is 7 &times; 6?</p>
+    <label><input type="radio" name="q1" value="36" required /> 36</label>
+    <label><input type="radio" name="q1" value="42" /> 42</label>
+    <label><input type="radio" name="q1" value="48" /> 48</label>
+
+    <p><strong>2)</strong> Solve: 18 &divide; 3 =</p>
+    <label><input type="radio" name="q2" value="5" required /> 5</label>
+    <label><input type="radio" name="q2" value="6" /> 6</label>
+    <label><input type="radio" name="q2" value="9" /> 9</label>
+
+    <p><strong>3)</strong> Which inequality is true?</p>
+    <label><input type="radio" name="q3" value="3_lt_2" required /> 3 &lt; 2</label>
+    <label><input type="radio" name="q3" value="5_le_5" /> 5 &le; 5</label>
+    <label><input type="radio" name="q3" value="9_gt_12" /> 9 &gt; 12</label>
+  </fieldset>
+
+  <fieldset>
+    <legend>Word Problem</legend>
+    <p><strong>4)</strong> A baker made 48 cupcakes. She packs them equally into boxes of 6. How many boxes are filled? If 2 are taste-tested first, how many are left unpacked? Explain your reasoning clearly.</p>
+    <textarea id="wordAnswer" placeholder="Type your explanation here..." required></textarea>
+  </fieldset>
+
+  <fieldset>
+    <legend>Math Symbols (examples)</legend>
+    <p>&plus; &minus; &times; &divide; &lt; &gt; &le; &ge; &pi;</p>
+  </fieldset>
+
+  <div class="submit-row">
+    <button type="button" id="submitBtn">Submit</button>
+    <a class="btn" href="#start" id="backToStart">Back to Start</a>
+  </div>
+  <div id="quizError" class="note" role="alert" aria-live="assertive"></div>
+</form>
 
 <!-- Start Screen AFTER quiz so CSS can hide it when #quiz is targeted -->
 <section id="startScreen" class="card" aria-labelledby="startTitle">
-<h2 id="startTitle">Start Quiz</h2>
-<p>Enter your name and click <strong>Start Quiz</strong>.</p>
-<label for="studentName">Your Name</label>
-<input id="studentName" type="text" placeholder="e.g., Alex Rivera" required />
-<div class="submit-row">
-<!-- Anchor starts quiz even without JS -->
-<a href="#quiz" id="startLink" class="btn">Start Quiz</a>
-<!-- Button also calls JS when available -->
-<button type="button" id="startBtn">Start (JS)</button>
-</div>
-<div id="startError" class="note" role="alert" aria-live="assertive"></div>
+  <h2 id="startTitle">Start Quiz</h2>
+  <p>Enter your name and click <strong>Start Quiz</strong>.</p>
+  <label for="studentName">Your Name</label>
+  <input id="studentName" type="text" placeholder="e.g., Alex Rivera" required />
+  <div class="submit-row">
+    <!-- Anchor starts quiz even without JS -->
+    <a href="#quiz" id="startLink" class="btn">Start Quiz</a>
+    <!-- Button also calls JS when available -->
+    <button type="button" id="startBtn">Start (JS)</button>
+  </div>
+  <div id="startError" class="note" role="alert" aria-live="assertive"></div>
 </section>
-
-
-<!-- Confirmation -->
-<section id="confirmation" class="card hidden">
-<h2>Submission Received</h2>
-<p id="confirmMsg"></p>
-<div class="submit-row"><a href="#start" class="btn" id="restartLink">Restart</a></div>
-</section>
-
 
 <script>
-// JS enhancement (but page also works without JS)
-(function(){
-const startBtn = document.getElementById('startBtn');
-const startLink = document.getElementById('startLink');
-const startScreen = document.getElementById('startScreen');
-const quizForm = document.getElementById('quiz');
-const submitBtn = document.getElementById('submitBtn');
-const startError = document.getElementById('startError');
-const nameInput = document.getElementById('studentName');
-const confirmSection = document.getElementById('confirmation');
-const confirmMsg = document.getElementById('confirmMsg');
-const wordAnswer = document.getElementById('wordAnswer');
+  // Helper: simple required check for radios per group
+  function radioGroupChecked(name) {
+    return !!document.querySelector('input[name="' + name + '"]:checked');
+  }
 
+  document.addEventListener('DOMContentLoaded', () => {
+    const startBtn = document.getElementById('startBtn');
+    const startLink = document.getElementById('startLink');
+    const nameInput = document.getElementById('studentName');
+    const startError = document.getElementById('startError');
 
-function showQuiz(){
-// Validate name
-const name = (nameInput.value || '').trim();
-if(!name){
-startError.textContent = 'Please enter your name to begin.';
-nameInput.focus();
-return false;
-}
-startError.textContent = '';
-// JS show/hide without relying on hash
-startScreen.classList.add('hidden');
-confirmSection.classList.add('hidden');
-quizForm.style.display = 'block';
-location.hash = ''; // clear hash so CSS doesn't fight JS
-return true;
-}
+    const quizForm = document.getElementById('quiz');
+    const submitBtn = document.getElementById('submitBtn');
+    const quizError = document.getElementById('quizError');
 
+    // Make the JS Start button work
+    startBtn.addEventListener('click', () => {
+      const name = nameInput.value.trim();
+      if (!name) {
+        startError.textContent = 'Please enter your name before starting.';
+        nameInput.focus();
+        return;
+      }
+      startError.textContent = '';
+      // Use the same mechanism as the no-JS link so CSS :target toggles views
+      location.hash = '#quiz';
+      // Optional: put the cursor in the first question
+      const firstRadio = document.querySelector('input[name="q1"]');
+      if (firstRadio) firstRadio.focus();
+    });
 
-function submitQuiz(){
-const requiredRadios = ['q1','q2','q3'];
-for(const q of requiredRadios){
-if(!quizForm.querySelector(`input[name="${q}"]:checked`)){
-alert('Please answer all multiple‑choice questions.');
-return;
-}
-}
-if(!wordAnswer.value.trim()){
-alert('Please complete the word‑problem explanation.');
-return;
-}
-quizForm.style.display = 'none';
-confirmSection.classList.remove('hidden');
-confirmMsg.textContent = `Thanks, ${(nameInput.value||'Student').trim()}! Your submission has been received.`;
-}
+    // Optional: if they use the no-JS link while JS is available, still validate the name
+    startLink.addEventListener('click', (e) => {
+      if (!nameInput.value.trim()) {
+        e.preventDefault();
+        startError.textContent = 'Please enter your name before starting.';
+        nameInput.focus();
+      } else {
+        startError.textContent = '';
+      }
+    });
 
+    // Basic front-end validation for quiz submission
+    submitBtn.addEventListener('click', () => {
+      quizError.textContent = '';
+      const wordAnswer = document.getElementById('wordAnswer');
 
-// Wire up JS start button
-if (startBtn) startBtn.addEventListener('click', showQuiz);
+      const allGood =
+        radioGroupChecked('q1') &&
+        radioGroupChecked('q2') &&
+        radioGroupChecked('q3') &&
+        wordAnswer.value.trim().length > 0;
 
+      if (!allGood) {
+        quizError.textContent = 'Please answer all questions before submitting.';
+        // Focus the first missing thing
+        if (!radioGroupChecked('q1')) {
+          document.querySelector('input[name="q1"]').focus();
+        } else if (!radioGroupChecked('q2')) {
+          document.querySelector('input[name="q2"]').focus();
+        } else if (!radioGroupChecked('q3')) {
+          document.querySelector('input[name="q3"]').focus();
+        } else {
+          wordAnswer.focus();
+        }
+        return;
+      }
 
-// Enhance anchor: validate name first; if OK, prevent default and show quiz
-if (startLink) startLink.addEventListener('click', function(e){
-if (!showQuiz()) { e.preventDefault(); }
-});
-
-
-// Submit button (client side only)
-if (submitBtn) submitBtn.addEventListener('click', submitQuiz);
-
-
-// Enter key on name starts quiz
-nameInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); showQuiz(); }});
-})();
+      // Replace with whatever you want to do on successful submit
+      alert('Thanks! Your quiz has been submitted.');
+    });
+  });
 </script>
 </body>
 </html>
